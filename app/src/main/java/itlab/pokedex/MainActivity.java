@@ -2,6 +2,8 @@ package itlab.pokedex;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -23,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         loadPokemonDB();
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        PokemonAdapter pokemonAdapter = new PokemonAdapter(this, pokemonList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(pokemonAdapter);
+
     }
 
     public void loadPokemonDB() {
