@@ -4,47 +4,34 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ProgressBar;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<Pokemon> pokemonList;
+    RecyclerView recyclerView;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        loadPokemonDB();
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        PokemonAdapter pokemonAdapter = new PokemonAdapter(this, pokemonList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(pokemonAdapter);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
+
+        WebServicePokemon ws = new WebServicePokemon();
+        ws.getPokemones().subscribe(this::addPokemonList, Throwable::printStackTrace);
 
     }
 
-    public void loadPokemonDB() {
-        try {
-            InputStream ims = getAssets().open("PokeDB.json");
-            Gson gson = new Gson();
-            Reader reader = new InputStreamReader(ims);
-            Type listType = new TypeToken<ArrayList<Pokemon>>() {
-            }.getType();
-            pokemonList = gson.fromJson(reader, listType);
-        } catch (IOException e) {
-            e.printStackTrace();
-            pokemonList = new ArrayList<>();
-        }
+    public void addPokemonList(List<Pokemon> pokemonList) {
+        progressBar.setVisibility(View.GONE);
+        PokemonAdapter pokemonAdapter = new PokemonAdapter(this, pokemonList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(pokemonAdapter);
     }
 
 }
